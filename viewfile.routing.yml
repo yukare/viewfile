@@ -1,0 +1,50 @@
+# Show the content of a file.
+viewfile.view:
+  path: 'view/{folder}'
+  defaults:
+    _controller: '\Drupal\viewfile\Controller\ViewFileController::content'
+    _title: 'View File'
+  requirements:
+    _permission: 'view file content'
+
+# Settings for viewfile.
+viewfile.settings:
+  path: 'admin/config/media/viewfile'
+  defaults:
+    _form: '\Drupal\viewfile\Form\SettingsForm'
+    _title: 'View File'
+  requirements:
+    _permission: 'administer site configuration'
+
+# Folder routing definition
+entity.folder.list:
+  path: '/admin/config/media/viewfile/folder'
+  defaults:
+    _entity_list: 'folder'
+    _title: 'Folder Configuration'
+  requirements:
+    _permission: 'administer view file folders'
+
+entity.folder.add_form:
+  path: '/admin/config/media/viewfile/folder/add'
+  defaults:
+    _entity_form: 'folder.add'
+    _title: 'Add Folder'
+  requirements:
+    _permission: 'administer view file folders'
+
+entity.folder.edit_form:
+  path: '/admin/config/media/viewfile/folder/{folder}'
+  defaults:
+    _entity_form: 'folder.edit'
+    _title: 'Edit Folder'
+  requirements:
+    _permission: 'administer view file folders'
+
+entity.folder.delete_form:
+  path: '/admin/config/media/viewfile/folder/{folder}/delete'
+  defaults:
+    _entity_form: 'folder.delete'
+    _title: 'Delete Folder'
+  requirements:
+    _permission: 'administer view file folders'

@@ -1,0 +1,5 @@
+services:
+  path_processor.files:
+    class: Drupal\viewfile\PathProcessor\PathProcessorFiles
+    tags:
+      - { name: path_processor_inbound, priority: 200 }

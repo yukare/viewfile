@@ -1,0 +1,9 @@
+name: 'View File'
+description: 'Show the contents of a file.'
+type: module
+package: 'Other'
+core: 8.x
+# configure: admin/config/content/viewfile
+dependencies:
+  - geshifilter
+

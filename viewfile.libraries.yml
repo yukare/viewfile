@@ -1,0 +1,9 @@
+# Important: all this css and js comes from http://www.drupal.org/project/filetree
+# i just need to use there with some changes, this is the reason of copy/paste.
+filetree:
+  version: VERSION
+  js:
+    assets/js/filetree.js: {}
+  css:
+    component:
+      assets/css/filetree.css: {}

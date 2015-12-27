@@ -1,0 +1,15 @@
+viewfile.folder.*:
+  type: config_entity
+  label: 'Folder config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    name:
+      type: label
+      label: 'Name'
+    path:
+      type: string
+      label: 'Path'  
+    uuid:
+      type: string

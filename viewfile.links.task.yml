@@ -1,0 +1,30 @@
+# Settings: admin/config/medie/viewfile.
+viewfile.settings_tab:
+  route_name: viewfile.settings
+  title: 'Settings'
+  base_route: viewfile.settings_tab
+  weight: -1
+
+# List folders: /admin/config/media/viewfile/folder.
+viewfile.entity.folder.list_tab:
+  route_name: entity.folder.list
+  title: 'List Folders'
+  base_route: viewfile.settings_tab
+
+# Add folders: /admin/config/media/viewfile/folder/add.
+viewfile.entity.folder.add_form_tab:
+  route_name: entity.folder.add_form
+  title: 'Add Folder'
+  base_route: viewfile.settings_tab
+
+# List folders: /admin/config/media/viewfile/folder/{folder}.
+#viewfile.entity.folder.edit_tab:
+#  route_name: entity.folder.edit
+#  title: 'Languages'
+#  base_route: viewfile.settings_tab
+
+# List folders: /admin/config/media/viewfile/folder/{folder}/delete.
+#viewfile.entity.folder.delete_tab:
+#  route_name: entity.folder.delete
+#  title: 'Languages'
+#  base_route: viewfile.settings_tab
