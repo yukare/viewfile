@@ -9,6 +9,7 @@ namespace Drupal\viewfile\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ViewFileController.
@@ -30,8 +31,9 @@ class ViewFileController extends ControllerBase {
   public function content($folder = NULL, Request $request) {
     $file = $request->query->get('file');
     $content = array();
-    $entity = entity_load('folder', $folder);
-    if ($entity) {
+    $valid = $this->validFile($folder, $file);
+    if($valid) {
+      $entity = entity_load('folder', $folder);
       $content[] = $this->renderTree($folder);
       $content[] = $this->renderFile($folder, $file);
     }
@@ -115,6 +117,21 @@ class ViewFileController extends ControllerBase {
     return $content;
   }
 
+  public function validFile($folder, $file) {
+    $entity = entity_load('folder', $folder);
+    if ($entity) {
+       $dirname = $this->getAbsolutePath($entity->getPath());
+       $filename = realpath($dirname . '/' . $file);
+       // Test if the file exists and is inside the folder path.
+      if ((strpos($filename, $dirname) === 0) && file_exists($filename)) {
+        return TRUE;
+      }
+    }
+    // If the file is not valid before, then it is invalid now.
+    throw new NotFoundHttpException();
+    return FALSE;
+  }
+
   public function getAbsolutePath($path) {
     // We have a drupal path public:// or private://.
     if($this->startsWith($path,array('public://', 'private://'))) {
@@ -122,7 +139,7 @@ class ViewFileController extends ControllerBase {
     }
     // We have an absolute path.
     elseif($this->startsWith($path, '/')) {
-      return $path;
+      return realpath($path);
     }
     // We have an relative path.
     return realpath(DRUPAL_ROOT . '/' . $path);
