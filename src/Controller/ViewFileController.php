@@ -20,19 +20,19 @@ class ViewFileController extends ControllerBase {
   /**
    * Return the content for the page.
    *
+   * @param Symfony\Component\HttpFoundation\Request $request
+   *   The name of the file(all the rest of url).
    * @param string $folder
    *   The name of folder(1st argument from url).
-   * @param string $file
-   *   The name of the file(all the rest of url).
    *
    * @return array
    *   Return the render array with the content of the page.
    */
-  public function content($folder = NULL, Request $request) {
+  public function content(Request $request, $folder = NULL) {
     $file = $request->query->get('file');
     $content = array();
     $valid = $this->validFile($folder, $file);
-    if($valid) {
+    if ($valid) {
       $entity = entity_load('folder', $folder);
       $content[] = $this->renderTree($folder);
       $content[] = $this->renderFile($folder, $file);
@@ -117,12 +117,27 @@ class ViewFileController extends ControllerBase {
     return $content;
   }
 
+  /**
+   * Test if the file in url is valid.
+   *
+   * Test if the file exists, and it is inside the given project, so we
+   * prevent the opening of a file outside the project.
+   *
+   * @param string $folder
+   *   The name of folder entity.
+   * @param string $file
+   *   The path to file(as it is in url).
+   *
+   * @return bool
+   *   TRUE if the file existir and is inside the folder.
+   */
   public function validFile($folder, $file) {
     $entity = entity_load('folder', $folder);
     if ($entity) {
-       $dirname = $this->getAbsolutePath($entity->getPath());
-       $filename = realpath($dirname . '/' . $file);
-       // Test if the file exists and is inside the folder path.
+      $dirname = $this->getAbsolutePath($entity->getPath());
+      $filename = realpath($dirname . '/' . $file);
+
+      // Test if the file exists and is inside the folder path.
       if ((strpos($filename, $dirname) === 0) && file_exists($filename)) {
         return TRUE;
       }
@@ -132,13 +147,25 @@ class ViewFileController extends ControllerBase {
     return FALSE;
   }
 
+  /**
+   * Get the absolute path to file.
+   *
+   * This function convert relative paths to absolute and convert drupal uri like
+   * private: and public:.
+   *
+   * @param string $path
+   *   The path to file, as it is in url.
+   *
+   * @return string
+   *   The absolute path to file in the filesystem.
+   */
   public function getAbsolutePath($path) {
     // We have a drupal path public:// or private://.
-    if($this->startsWith($path,array('public://', 'private://'))) {
+    if ($this->startsWith($path, array('public://', 'private://'))) {
       return drupal_realpath($path);
     }
     // We have an absolute path.
-    elseif($this->startsWith($path, '/')) {
+    elseif ($this->startsWith($path, '/')) {
       return realpath($path);
     }
     // We have an relative path.
@@ -148,28 +175,44 @@ class ViewFileController extends ControllerBase {
   /**
    * Determine if a given string starts with a given substring.
    *
-   * @param  string  $haystack
-   * @param  string|array  $needles
+   * @param string $haystack
+   *   The string that we will search into it.
+   * @param string|array $needles
+   *   One string or an array to search into $haystack.
+   *
    * @return bool
+   *   TRUE if the string $haystack start with one from $needles.
    */
-  public static function startsWith($haystack, $needles)
-  {
-    foreach ((array) $needles as $needle)
-    {
-      if ($needle != '' && strpos($haystack, $needle) === 0) return true;
+  public static function startsWith($haystack, $needles) {
+    foreach ((array) $needles as $needle) {
+      if ($needle != '' && strpos($haystack, $needle) === 0) {
+        return TRUE;
+      }
     }
-    return false;
+    return FALSE;
   }
 
+  /**
+   * Return the available types of contents.
+   *
+   * @return array
+   *   Return an associative array with the types of content, where the key is
+   *   the file extension and the value is the path of the class name.
+   */
   protected function getTypes() {
     // Types we know how to handle.
     $types = array(
+      'css' => 'Code',
+      'inc' => 'Code',
+      'jpg' => 'Image',
+      'json' => 'Code',
+      'md' => 'Code',
+      'module' => 'Code',
       'php' => 'Code',
-      'jpeg' => 'Image',
       'png' => 'Image',
       'yml' => 'Code',
     );
     return $types;
   }
-}
 
+}

@@ -22,7 +22,7 @@ class ViewFileTypeCode extends ViewFileTypeBase implements ViewFileTypeInterface
    */
   public function content() {
     $attr = array(
-      'linenumbers' => '0',
+      'linenumbers' => '1',
       'title' => '',
       'fancy' => 0,
       'language' => $this->getLanguage(),
@@ -31,7 +31,7 @@ class ViewFileTypeCode extends ViewFileTypeBase implements ViewFileTypeInterface
     $content = GeshiFilterProcess::geshiProcess($file, $attr['language']);
 
     // Drupal black magic: pass the raw content from geshi to render array.
-    $raw = array (
+    $raw = array(
       '#type' => 'inline_template',
       '#template' => '{{ foo|raw }}',
       '#context' => ['foo' => $content],
@@ -47,6 +47,7 @@ class ViewFileTypeCode extends ViewFileTypeBase implements ViewFileTypeInterface
    */
   protected function getLanguage() {
     $language = array(
+      'css' => 'css',
       'install' => 'php',
       'module' => 'php',
       'php' => 'php',
