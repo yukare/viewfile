@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains Drupal\viewfile\Controller\Type\ViewFileTypeDownload.
- */
 
 namespace Drupal\viewfile\Controller\Type;
 

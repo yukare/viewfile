@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\viewfile\Form\FolderDeleteForm.
- */
-
 namespace Drupal\viewfile\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;

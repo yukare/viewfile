@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\viewfile\Controller\Type\ViewFileTypeCode.
- */
-
 namespace Drupal\viewfile\Controller\Type;
 
 use Drupal\geshifilter\GeshiFilterProcess;
@@ -54,7 +49,12 @@ class ViewFileTypeCode extends ViewFileTypeBase implements ViewFileTypeInterface
       'yml' => 'yaml',
     );
     $extension = pathinfo($this->filename, PATHINFO_EXTENSION);
-    return $language[$extension];
+    if (isset($language[$extension])) {
+      return $language[$extension];
+    }
+    else {
+      return "text";
+    }
   }
 
 }

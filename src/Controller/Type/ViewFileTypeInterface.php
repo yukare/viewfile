@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\viewfile\Controller\Type\ViewFileTypeInterface.
- */
-
 namespace Drupal\viewfile\Controller\Type;
 
 /**

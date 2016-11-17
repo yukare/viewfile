@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Definition of Drupal\filetree\FileTree.
- */
 
 namespace Drupal\viewfile;
 
@@ -18,6 +14,7 @@ use Drupal\Component\Utility\Html;
  * @package Drupal\viewfile
  */
 class FileTree {
+
   /**
    * Recursively list folders and files in this directory.
    *
@@ -95,7 +92,7 @@ class FileTree {
     $icon = 'file';
     $map = array(
       'application' => array('exe'),
-      // 'code' => array(''),
+      // 'code' => array(''),.
       'css' => array('css'),
       'db' => array('sql'),
       'doc' => array('doc', 'docx'),
@@ -103,14 +100,14 @@ class FileTree {
       'flash' => array('flv', 'swf'),
       'html' => array('htm', 'html'),
       // 'java' => array(''),
-      // 'linux' => array(''),
+      // 'linux' => array(''),.
       'music' => array('mp3', 'aac'),
       'pdf' => array('pdf'),
       'php' => array('php'),
       'image' => array('jpg', 'jpeg', 'gif', 'png', 'bmp'),
       'ppt' => array('ppt'),
       'psd' => array('psd'),
-      // 'ruby' => array(''),
+      // 'ruby' => array(''),.
       'script' => array('asp'),
       'txt' => array('txt'),
       'xls' => array('xls', 'xlsx'),

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\viewfile\FolderInterface.
- */
-
 namespace Drupal\viewfile;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;

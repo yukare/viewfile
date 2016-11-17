@@ -1,7 +1,10 @@
 view file content:
-  title: 'View Files'
-  description: 'Allow the user view the content of files.'
+  title: 'ViewFile: access all files and folders.'
+  description: 'Allow the user view the content of all files and folders from viewfiles.'
 
 administer view file folders:
-  title: 'View Files: administer folders.'
+  title: 'ViewFile: administer folders.'
   description: 'Allow the user adminster the folders available to view.'
+
+permission_callbacks:
+  - \Drupal\viewfile\Permissions::getPermissions

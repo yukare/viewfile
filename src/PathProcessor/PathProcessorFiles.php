@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\viewfile\PathProcessor;
 
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
@@ -22,27 +23,11 @@ class PathProcessorFiles implements InboundPathProcessorInterface {
       unset($pieces[2]);
       unset($pieces[1]);
       unset($pieces[0]);
-      $path = join('/', $pieces);
+      $path = implode('/', $pieces);
       $request->query->set('file', $path);
       return '/view/' . $folder;
     }
     return $path;
-  }
-
-  /**
-   * Determine if a given string starts with a given substring.
-   *
-   * @param  string  $haystack
-   * @param  string|array  $needles
-   * @return bool
-   */
-  public static function startsWith($haystack, $needles)
-  {
-    foreach ((array) $needles as $needle)
-    {
-      if ($needle != '' && strpos($haystack, $needle) === 0) return true;
-    }
-    return false;
   }
 
 }

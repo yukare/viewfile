@@ -1,12 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\viewfile\Controller\ViewFileControllerer.
- */
-
 namespace Drupal\viewfile\Controller;
 
+use Drupal\viewfile\FileTree;
+use Drupal\viewfile\Entity\Folder;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,11 +14,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * @package Drupal\viewfile\Controller
  */
 class ViewFileController extends ControllerBase {
+
   /**
    * Return the content for the page.
    *
    * @param Symfony\Component\HttpFoundation\Request $request
-   *   The name of the file(all the rest of url).
+   *   The request object from Synfony. From this object, we can get the
+   *   file name from query.
    * @param string $folder
    *   The name of folder(1st argument from url).
    *
@@ -29,13 +28,37 @@ class ViewFileController extends ControllerBase {
    *   Return the render array with the content of the page.
    */
   public function content(Request $request, $folder = NULL) {
-    $file = $request->query->get('file');
     $content = array();
-    $valid = $this->validFile($folder, $file);
-    if ($valid) {
-      $entity = entity_load('folder', $folder);
-      $content[] = $this->renderTree($folder);
-      $content[] = $this->renderFile($folder, $file);
+
+    // $file is the name of the file from url.
+    $file = $request->query->get('file');
+
+    /* @var Drupal\viewfile\Entity\Folder */
+    $entity = entity_load('folder', $folder);
+
+    if ($entity) {
+      // $path is the full path to file.
+      $dirname = $entity->getAbsolutePath();
+      $path = realpath($dirname . '/' . $file);
+
+      $valid = $this->validFile($entity, $path);
+      if ($valid) {
+        $content[] = $this->renderTree($entity);
+        if (is_dir($path)) {
+          $content[] = $this->renderDirectory($entity, $path);
+        }
+        else {
+          $content[] = $this->renderFile($entity, $path);
+        }
+      }
+      else {
+        // The file is not valid, return a page not found exception.
+        throw new NotFoundHttpException();
+      }
+    }
+    else {
+      // The entity name is not valid, return a page not found exception.
+      throw new NotFoundHttpException();
     }
     return $content;
   }
@@ -45,22 +68,23 @@ class ViewFileController extends ControllerBase {
    *
    * Create and show the tree for a folder.
    *
-   * @param string $folder
-   *   The folder name.
+   * @param \Drupal\viewfile\Entity\Folder $entity
+   *   The Folder entity.
    *
    * @return array
    *   One element from a render array with all markup to show
    *   the tree of files.
    */
-  protected function renderTree($folder) {
+  protected function renderTree(Folder $entity) {
     $content = array();
-    $entity = entity_load('folder', $folder);
-    $path = $this->getAbsolutePath($entity->getPath());
-    $filetree = new \Drupal\viewfile\FileTree();
+    $path = $entity->getAbsolutePath();
+    $filetree = new FileTree();
     $params = array(
       'multi' => TRUE,
       'controls' => TRUE,
-      'folder' => $folder,
+      'folder' => $entity->id()
+
+      ,
       'folderRoot' => $path,
       'animation' => FALSE,
     );
@@ -76,10 +100,10 @@ class ViewFileController extends ControllerBase {
    * This function create the html markup to show the file depending on file
    * type. A class is used for the real work for each file type.
    *
-   * @param string $folder
-   *   The name of the folder.
-   * @param string $file
-   *   The name and the path of file inside folder.
+   * @param \Drupal\viewfile\Entity\Folder $entity
+   *   The folder entity.
+   * @param string $path
+   *   The name and the full path to file.
    *
    * @return array
    *   One element from a render array to show the content of
@@ -87,33 +111,47 @@ class ViewFileController extends ControllerBase {
    *
    * @todo Decide how to handle file types that we do not know.
    */
-  protected function renderFile($folder, $file) {
+  protected function renderFile(Folder $entity, $path) {
     $types = $this->getTypes();
+    $dirname = $entity->getAbsolutePath();
 
-    $entity = entity_load('folder', $folder);
-
-    $dirname = $this->getAbsolutePath($entity->getPath());
-    $filename = $dirname . '/' . $file;
     // Test if the file exists and is inside the folder path.
-    if ((strpos($filename, $dirname) === 0) && file_exists($filename)) {
-      $fileinfo = pathinfo($filename);
+    if ((strpos($path, $dirname) === 0) && file_exists($path)) {
+      $fileinfo = pathinfo($path);
       // Test if we have a controller for this extension.
       if (isset($types[$fileinfo['extension']])) {
         $classname = '\Drupal\viewfile\Controller\Type\ViewFileType' . $types[$fileinfo['extension']];
-        /** @var \Drupal\viewfile\Controller\Type\ViewFileTypeInterface $class */
+        /* @var \Drupal\viewfile\Controller\Type\ViewFileTypeInterface $class */
         $class = new $classname();
-        $class->setFilename($filename);
+        $class->setFilename($path);
         $content = $class->content();
       }
       else {
         // We do not have a controller for this extension.
         $classname = '\Drupal\viewfile\Controller\Type\ViewFileTypeCode';
-        /** @var \Drupal\viewfile\Controller\Type\ViewFileTypeInterface $class */
+        /* @var \Drupal\viewfile\Controller\Type\ViewFileTypeInterface $class */
         $class = new $classname();
-        $class->setFilename($filename);
+        $class->setFilename($path);
         $content = $class->content();
       }
     }
+    return $content;
+  }
+
+  /**
+   * Render the content of a directory.
+   *
+   * @param \Drupal\viewfile\Entity\Folder $entity
+   *   The folder entity.
+   * @param string $path
+   *   The name and the full path to file.
+   *
+   * @return array
+   *   One element from a render array to show the content of
+   *   the directory.
+   */
+  protected function renderDirectory(Folder $entity, $path) {
+    $content = array();
     return $content;
   }
 
@@ -123,72 +161,22 @@ class ViewFileController extends ControllerBase {
    * Test if the file exists, and it is inside the given project, so we
    * prevent the opening of a file outside the project.
    *
-   * @param string $folder
-   *   The name of folder entity.
-   * @param string $file
-   *   The path to file(as it is in url).
+   * @param object $entity
+   *   The folder entity.
+   * @param string $path
+   *   Absolute path to file.
    *
    * @return bool
    *   TRUE if the file existir and is inside the folder.
    */
-  public function validFile($folder, $file) {
-    $entity = entity_load('folder', $folder);
-    if ($entity) {
-      $dirname = $this->getAbsolutePath($entity->getPath());
-      $filename = realpath($dirname . '/' . $file);
+  public function validFile($entity, $path) {
+    $dirname = $entity->getAbsolutePath();
 
-      // Test if the file exists and is inside the folder path.
-      if ((strpos($filename, $dirname) === 0) && file_exists($filename)) {
-        return TRUE;
-      }
+    // Test if the file exists and is inside the folder path.
+    if ((strpos($path, $dirname) === 0) && file_exists($path)) {
+      return TRUE;
     }
-    // If the file is not valid before, then it is invalid now.
-    throw new NotFoundHttpException();
-    return FALSE;
-  }
-
-  /**
-   * Get the absolute path to file.
-   *
-   * This function convert relative paths to absolute and convert drupal uri like
-   * private: and public:.
-   *
-   * @param string $path
-   *   The path to file, as it is in url.
-   *
-   * @return string
-   *   The absolute path to file in the filesystem.
-   */
-  public function getAbsolutePath($path) {
-    // We have a drupal path public:// or private://.
-    if ($this->startsWith($path, array('public://', 'private://'))) {
-      return drupal_realpath($path);
-    }
-    // We have an absolute path.
-    elseif ($this->startsWith($path, '/')) {
-      return realpath($path);
-    }
-    // We have an relative path.
-    return realpath(DRUPAL_ROOT . '/' . $path);
-  }
-
-  /**
-   * Determine if a given string starts with a given substring.
-   *
-   * @param string $haystack
-   *   The string that we will search into it.
-   * @param string|array $needles
-   *   One string or an array to search into $haystack.
-   *
-   * @return bool
-   *   TRUE if the string $haystack start with one from $needles.
-   */
-  public static function startsWith($haystack, $needles) {
-    foreach ((array) $needles as $needle) {
-      if ($needle != '' && strpos($haystack, $needle) === 0) {
-        return TRUE;
-      }
-    }
+    // If the file is not valid before, it is invalid.
     return FALSE;
   }
 

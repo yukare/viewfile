@@ -1,5 +1,5 @@
 name: 'View File'
-description: 'Show the contents of a file.'
+description: 'Show the contents of a files and folders.'
 type: module
 package: 'Other'
 core: 8.x

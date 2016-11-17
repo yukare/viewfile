@@ -1,4 +1,4 @@
-# Settings: admin/config/medie/viewfile.
+# Settings: admin/config/media/viewfile.
 viewfile.settings_tab:
   route_name: viewfile.settings
   title: 'Settings'
@@ -12,10 +12,10 @@ viewfile.entity.folder.list_tab:
   base_route: viewfile.settings_tab
 
 # Add folders: /admin/config/media/viewfile/folder/add.
-viewfile.entity.folder.add_form_tab:
-  route_name: entity.folder.add_form
-  title: 'Add Folder'
-  base_route: viewfile.settings_tab
+# viewfile.entity.folder.add_form_tab:
+#  route_name: entity.folder.add_form
+#  title: 'Add Folder'
+#  base_route: viewfile.settings_tab
 
 # List folders: /admin/config/media/viewfile/folder/{folder}.
 #viewfile.entity.folder.edit_tab:

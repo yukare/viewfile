@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\viewfile\Controller\FolderListBuilder.
- */
-
 namespace Drupal\viewfile\Controller;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
@@ -14,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Provides a listing of Folder.
  */
 class FolderListBuilder extends ConfigEntityListBuilder {
+
   /**
    * {@inheritdoc}
    */

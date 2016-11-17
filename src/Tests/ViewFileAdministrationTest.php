@@ -1,10 +1,5 @@
 <?php
-/**
- * @file
- * Definition of Drupal\viewfile\Tests\ViewFileAdministrationTest.
- */
 
-// Namespace of tests.
 namespace Drupal\viewfile\Tests;
 
 // Use of base class for the tests.
@@ -19,11 +14,15 @@ class ViewFileAdministrationTest extends WebTestBase {
 
   /**
    * Administration user.
+   *
+   * @var object
    */
   protected $adminUser;
 
   /**
    * List of modules to enable.
+   *
+   * @var array
    */
   public static $modules = array(
     'libraries',
@@ -66,6 +65,9 @@ class ViewFileAdministrationTest extends WebTestBase {
     $this->drupalPostForm('admin/config/media/viewfile/folder/add', $edit, t('Save'));
   }
 
+  /**
+   * Test if we can create one folder.
+   */
   protected function testFolder() {
     // Create folder with test.
     $edit['name'] = 'Test';
